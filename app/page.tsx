@@ -35,18 +35,44 @@ const projects = [
 
 const skills = [
   ["React", "react", "#19aee5"],
-  ["Next.js", "next", "#111111"],
   ["TypeScript", "ts", "#3178c6"],
   ["JavaScript", "js", "#f0c500"],
-  ["Tailwind CSS", "tw", "#38bdf8"],
+  ["Next.js", "next", "#111111"],
+  ["Node.js", "node", "#43853d"],
+  ["Express.js", "express", "#111111"],
+  ["Material UI", "material", "#007fff"],
+  ["AngularJS", "angular", "#dd0031"],
+  ["Vue.js", "vue", "#42b883"],
+  ["React Native", "native", "#61dafb"],
+  ["PHP", "php", "#777bb4"],
+  ["MySQL", "mysql", "#4479a1"],
+  ["jQuery", "jquery", "#0769ad"],
+  ["Google Maps API", "maps", "#34a853"],
+  ["WordPress", "wordpress", "#21759b"],
+  ["Strapi", "strapi", "#4945ff"],
+  ["Shopify", "shopify", "#95bf47"],
+  ["HubSpot", "hubspot", "#ff7a59"],
+  ["Zapier", "zapier", "#ff4f00"],
+  ["AWS", "aws", "#ff9900"],
+  ["Vercel", "vercel", "#111111"],
+  ["Google Cloud", "gcp", "#4285f4"],
+  ["Jenkins", "jenkins", "#d24939"],
+  ["Figma", "figma", "#f14d8a"],
+  ["Webpack", "webpack", "#8ed6fb"],
   ["HTML5", "html", "#ee6335"],
   ["CSS3", "css", "#397bdc"],
-  ["Git", "git", "#ed4d34"],
-  ["GitHub", "github", "#111111"],
-  ["Figma", "figma", "#f14d8a"],
-  ["Supabase", "supabase", "#23b47e"],
-  ["Vercel", "vercel", "#111111"],
-  ["PostgreSQL", "postgres", "#3b6d99"],
+] as const;
+
+const experience = [
+  ["E", "Ezygos Global Services", "Senior Front End Developer", "September 2025 — Present", "Builds responsive React interfaces, reusable components, and API-driven experiences. Focuses on performance, analytics, testing, and cross-team delivery."],
+  ["M", "Medilink", "Senior Front End Developer", "August 2023 — June 2025", "Improved a React and TypeScript product with Material UI, Node.js APIs, and Figma-based UI delivery. Led code reviews and maintained a consistent visual system."],
+  ["G", "Gro Clinics", "Senior Front End Developer", "January 2023 — August 2023", "Built healthcare web experiences with React, Next.js, Node.js, and headless CMS tools. Supported CRM, Shopify, and workflow automation across the business."],
+  ["U", "Upraxis Global Limited", "Team Lead, Front-End Developer", "June 2019 — December 2022", "Led front-end delivery across AngularJS, Vue, React/Next.js, and React Native projects. Mentored teammates and helped teams ship quality software in an Agile environment."],
+  ["I", "Inteluck Corporation", "JavaScript/UX Developer", "September 2014 — May 2019", "Developed tracking systems and reusable libraries with JavaScript, React, Node.js, and Google Maps APIs. Shaped the product UI/UX for vehicle monitoring."],
+  ["U", "Una Realidad", "PHP Web Developer", "January 2014 — July 2014", "Built e-commerce experiences with PHP, MySQL, Smarty, jQuery, and CSS3. Translated designs into web pages and handled QA, debugging, and client support."],
+  ["M", "Mobext Inc.", "Web Developer", "September 2013 — November 2013", "Delivered responsive PHP websites integrated with Drupal CMS. Converted PSD designs into mobile-ready pages."],
+  ["G", "Globalink Holding Corp.", "Programmer", "March 2013 — August 2013", "Maintained service systems and built monitoring, tracking, and client-checking features around business requirements."],
+  ["P", "Philippine Navy", "PHP Programmer", "November 2011 — February 2013", "Maintained the Navy website, added PHP features, and trained staff in web development. Built a Java-based telephone and personnel directory."],
 ] as const;
 
 function Arrow({ diagonal = false }: { diagonal?: boolean }) {
@@ -79,15 +105,13 @@ function ProjectVisual({ type }: { type: string }) {
 }
 
 function SkillIcon({ kind, color }: { kind: string; color: string }) {
-  return <span className={`skill-icon icon-${kind}`} style={{ color }} aria-hidden="true">{kind === "ts" ? "Ts" : kind === "js" ? "JS" : kind === "html" ? "5" : kind === "css" ? "3" : kind === "github" ? "●" : kind === "next" ? "N" : kind === "postgres" ? "◉" : kind === "react" ? "✣" : kind === "tw" ? "≈" : kind === "git" ? "◆" : kind === "figma" ? "✣" : kind === "supabase" ? "↯" : "▲"}</span>;
+  const glyphs: Record<string, string> = { ts: "Ts", js: "JS", html: "5", css: "3", next: "N", react: "✣", node: "◆", express: "E", material: "M", angular: "A", vue: "V", native: "✣", php: "P", mysql: "◆", jquery: "jQ", maps: "⌖", wordpress: "W", strapi: "S", shopify: "S", hubspot: "H", zapier: "Z", aws: "▲", vercel: "▲", gcp: "G", jenkins: "J", figma: "✣", webpack: "◆" };
+  return <span className={`skill-icon icon-${kind}`} style={{ color }} aria-hidden="true">{glyphs[kind] ?? "•"}</span>;
 }
 
-function SocialIcon({ kind }: { kind: "github" | "linkedin" | "email" }) {
-  if (kind === "github") {
-    return <svg className="social-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.6-4-1.6-.5-1.4-1.3-1.7-1.3-1.7-1.1-.8.1-.8.1-.8 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.4-1.3-5.4-5.8 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.6.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.5-2.8 5.5-5.4 5.8.4.3.8 1 .8 2v2.9c0 .3.2.7.8.6A12 12 0 0 0 12 .3Z" /></svg>;
-  }
-  if (kind === "linkedin") {
-    return <svg className="social-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M5.2 3.5a2.1 2.1 0 1 1 0 4.2 2.1 2.1 0 0 1 0-4.2ZM3.4 9h3.6v11.5H3.4V9Zm5.8 0h3.4v1.6h.1c.5-.9 1.7-1.9 3.5-1.9 3.7 0 4.4 2.4 4.4 5.6v6.2H17v-5.5c0-1.3 0-3-1.9-3s-2.2 1.4-2.2 2.9v5.6H9.2V9Z" /></svg>;
+function SocialIcon({ kind }: { kind: "website" | "email" }) {
+  if (kind === "website") {
+    return <svg className="social-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="1.8" /><path fill="none" stroke="currentColor" strokeWidth="1.8" d="M3.5 12h17M12 3c2.5 2.3 3.7 5.3 3.7 9s-1.2 6.7-3.7 9c-2.5-2.3-3.7-5.3-3.7-9S9.5 5.3 12 3Z" /></svg>;
   }
   return <svg className="social-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M2.5 5.2h19v13.6h-19V5.2Zm1.9 2v9.6h15.2V7.2l-7.6 5.5-7.6-5.5Zm1.7-.1 5.9 4.2 5.9-4.2H6.1Z" /></svg>;
 }
@@ -213,7 +237,7 @@ export default function Home() {
         </nav>
         <a className="header-cta" href="#contact">Let&apos;s connect <Arrow /></a>
         <button className="menu-button" type="button" aria-label={menuOpen ? "Close menu" : "Open menu"} aria-expanded={menuOpen} onClick={() => setMenuOpen((open) => !open)}><span /><span /><span /></button>
-        {menuOpen && <nav className="mobile-nav" aria-label="Mobile navigation">{navigation.map(([label, id]) => <a key={id} href={`#${id}`} onClick={closeMenu}>{label}<Arrow /></a>)}<a className="mobile-contact" href="mailto:hello@johnryatienza.dev" onClick={closeMenu}>Start a conversation <Arrow /></a></nav>}
+        {menuOpen && <nav className="mobile-nav" aria-label="Mobile navigation">{navigation.map(([label, id]) => <a key={id} href={`#${id}`} onClick={closeMenu}>{label}<Arrow /></a>)}<a className="mobile-contact" href="mailto:johnry.atienza@gmail.com" onClick={closeMenu}>Start a conversation <Arrow /></a></nav>}
       </header>
 
       <section className="hero" id="home" data-parallax-section>
@@ -221,31 +245,31 @@ export default function Home() {
         <div className="hero-content page-width" data-hero-content>
           <p className="eyebrow">Hi, I&apos;m</p>
           <h1>Johnry Atienza</h1>
-          <p className="hero-role">Frontend Developer</p>
-          <p className="hero-copy">I build modern, responsive, and user-centric web applications with clean code and great experience.</p>
-          <div className="hero-actions"><a className="button button-dark" href="#projects">View my work <Arrow /></a><a className="button button-light" href="#contact">Download CV <span className="download-icon" aria-hidden="true">⇩</span></a></div>
-          <div className="social-links" aria-label="Social links"><a href="https://github.com" aria-label="GitHub"><SocialIcon kind="github" /></a><a href="https://linkedin.com" aria-label="LinkedIn"><SocialIcon kind="linkedin" /></a><a href="mailto:hello@johnryatienza.dev" aria-label="Email"><SocialIcon kind="email" /></a></div>
+          <p className="hero-role">Senior Frontend Developer</p>
+          <p className="hero-copy">I build efficient, scalable, and maintainable web applications with thoughtful front-end engineering.</p>
+          <div className="hero-actions"><a className="button button-dark" href="#projects">View my work <Arrow /></a><a className="button button-light" href="/Johnry-Atienza-CV-2026.pdf" download>Download CV <span className="download-icon" aria-hidden="true">⇩</span></a></div>
+          <div className="social-links" aria-label="Social links"><a href="https://johnryatienza.com" aria-label="Personal website"><SocialIcon kind="website" /></a><a href="mailto:johnry.atienza@gmail.com" aria-label="Email"><SocialIcon kind="email" /></a></div>
         </div>
         <div className="hero-scroll"><span>Scroll</span><b>＋</b></div>
         <div className="hero-dots" aria-hidden="true"><i className="active" /><i /><i /><i /></div>
       </section>
 
       <section className="intro-section page-width" id="about">
-        <div className="intro-lead" data-reveal><p className="section-kicker">About me</p><h2>Crafting digital<br />experiences that<br />make an <em>impact.</em></h2><p>I&apos;m a passionate developer who loves turning ideas into interactive solutions. I focus on performance, accessibility and clean code.</p><a className="text-button" href="#contact">More about me <Arrow /></a></div>
-        <div className="objective-grid"><div className="objective-main" data-reveal><ObjectiveIcon type="objective" /><div><p className="section-kicker">Objective</p><p>To leverage my skills in building scalable and efficient web applications while continuously learning and contributing to innovative projects that create real value for users and businesses.</p></div></div><div className="trait" data-reveal data-reveal-delay="1"><ObjectiveIcon type="problem" /><div><strong>Problem Solver</strong><p>I enjoy solving complex problems with simple, elegant solutions.</p></div></div><div className="trait" data-reveal data-reveal-delay="2"><ObjectiveIcon type="detail" /><div><strong>Detail Oriented</strong><p>I pay attention to details that create intuitive and seamless experiences.</p></div></div><div className="trait" data-reveal data-reveal-delay="3"><ObjectiveIcon type="learning" /><div><strong>Continuous Learner</strong><p>I stay up-to-date with modern technologies and best practices.</p></div></div></div>
+        <div className="intro-lead" data-reveal><p className="section-kicker">About me</p><h2>Crafting digital<br />experiences that<br />make an <em>impact.</em></h2><p>I&apos;m a passionate, creative, and detail-oriented senior front-end developer focused on efficient, scalable, and maintainable web applications.</p><a className="text-button" href="#contact">More about me <Arrow /></a></div>
+        <div className="objective-grid"><div className="objective-main" data-reveal><ObjectiveIcon type="objective" /><div><p className="section-kicker">Objective</p><p>To build reliable web products, keep learning modern technologies, and contribute to collaborative teams that create real value for users and businesses.</p></div></div><div className="trait" data-reveal data-reveal-delay="1"><ObjectiveIcon type="problem" /><div><strong>Problem Solver</strong><p>I turn complex requirements into clear, practical solutions.</p></div></div><div className="trait" data-reveal data-reveal-delay="2"><ObjectiveIcon type="detail" /><div><strong>Detail Oriented</strong><p>I care about quality, consistency, and polished user experiences.</p></div></div><div className="trait" data-reveal data-reveal-delay="3"><ObjectiveIcon type="learning" /><div><strong>Team Mentor</strong><p>I support teammates through coaching, reviews, and shared standards.</p></div></div></div>
       </section>
 
       <section className="projects-section" id="projects"><div className="page-width"><div className="section-heading"><div><p className="section-kicker">Featured projects</p><h2>Things I&apos;ve Built</h2></div><a className="button button-dark project-cta" href="#contact">View all projects <Arrow /></a></div><div className="project-grid">{projects.map((project, index) => <article className="project-card" data-reveal data-reveal-delay={index} key={project.title}><ProjectVisual type={project.type} /><div className="project-card-body"><div className="project-title-row"><h3>{project.title}</h3><Arrow diagonal /></div><p>{project.description}</p><div className="tags">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></div></article>)}</div><div className="carousel-dots" aria-label="Project carousel"><i className="active" /><i /><i /></div></div></section>
 
-      <section className="career-section page-width" id="experience"><div className="section-heading"><div><p className="section-kicker">Experience</p><h2>Where I&apos;ve Worked</h2></div><a className="view-all-mobile" href="#contact">View full experience <Arrow /></a></div><div className="timeline"><div className="timeline-line" data-reveal aria-hidden="true" />{[["S", "Solute Digital", "Senior Frontend Developer", "2023 — Present", "Lead frontend development for multiple projects using React, Next.js and TypeScript. Mentored junior developers and improved performance."], ["W", "WebCraft Studio", "Frontend Developer", "2021 — 2023", "Built responsive websites and web applications for clients across different industries. Focused on performance and SEO."], ["D", "Dev Solutions", "Junior Web Developer", "2019 — 2021", "Developed and maintained websites using HTML, CSS, JavaScript and PHP. Collaborated with designers and backend developers."], ["F", "Freelance", "Web Developer", "2016 — 2019", "Worked on various freelance projects ranging from landing pages to full website implementations."]].map(([initial, company, role, years, copy], index) => <article className="timeline-item" data-reveal data-reveal-delay={index} key={company}><div className="timeline-marker">{initial}</div><div><h3>{company}</h3><p className="role">{role}</p><p className="years">{years}</p><p>{copy}</p></div></article>)}</div></section>
+      <section className="career-section page-width" id="experience"><div className="section-heading"><div><p className="section-kicker">Experience</p><h2>Where I&apos;ve Worked</h2></div><a className="view-all-mobile" href="#contact">Let&apos;s connect <Arrow /></a></div><div className="timeline"><div className="timeline-line" data-reveal aria-hidden="true" />{experience.map(([initial, company, role, years, copy], index) => <article className="timeline-item" data-reveal data-reveal-delay={Math.min(index, 3)} key={company}><div className="timeline-marker">{initial}</div><div><h3>{company}</h3><p className="role">{role}</p><p className="years">{years}</p><p>{copy}</p></div></article>)}</div></section>
 
-      <section className="skills-section page-width" id="skills"><div className="section-heading"><div><p className="section-kicker">My skills</p><h2>Technologies I Use</h2></div></div><div className="skills-grid">{skills.map(([label, kind, color]) => <div className={`skill-card ${kind === "postgres" ? "wide-skill" : ""}`} key={label}><SkillIcon kind={kind} color={color} /><span>{label}</span></div>)}</div></section>
+      <section className="skills-section page-width" id="skills"><div className="section-heading"><div><p className="section-kicker">My skills</p><h2>Technologies I Use</h2></div></div><div className="skills-grid">{skills.map(([label, kind, color]) => <div className={`skill-card ${kind === "maps" ? "wide-skill" : ""}`} key={label}><SkillIcon kind={kind} color={color} /><span>{label}</span></div>)}</div></section>
 
-      <section className="contact-section" id="contact" data-parallax-section><div className="contact-backdrop" data-parallax-speed="0.12" aria-hidden="true" /><div className="contact-fog-layer" data-parallax-speed="0.2" aria-hidden="true" /><div className="contact-content"><p className="section-kicker">Let&apos;s work together</p><h2>Have a project in mind?</h2><p>I&apos;m currently open for new opportunities and exciting projects.<br />Let&apos;s build something great together.</p><a className="button button-dark" href="mailto:hello@johnryatienza.dev">Get in touch <Arrow /></a></div></section>
+      <section className="contact-section" id="contact" data-parallax-section><div className="contact-backdrop" data-parallax-speed="0.12" aria-hidden="true" /><div className="contact-fog-layer" data-parallax-speed="0.2" aria-hidden="true" /><div className="contact-content"><p className="section-kicker">Let&apos;s work together</p><h2>Have a project in mind?</h2><p>I&apos;m open to new opportunities and exciting projects.<br />Let&apos;s build something great together.</p><a className="button button-dark" href="mailto:johnry.atienza@gmail.com">Get in touch <Arrow /></a></div></section>
 
-      <section className="contact-details page-width" id="blog"><div><p className="section-kicker">Get in touch</p><a href="mailto:hello@johnryatienza.dev">✉ <span>hello@johnryatienza.dev</span></a><a href="tel:+639123456789">⌕ <span>+63 912 345 6789</span></a><a href="#contact">⌖ <span>Philippines</span></a><a href="#contact">◷ <span>Available for new projects</span></a></div><div className="details-note"><p className="section-kicker">A few words</p><h3>Good work starts<br />with a good conversation.</h3><p>Have an idea, a challenge, or a blank canvas? I&apos;d love to hear what you&apos;re working on.</p></div></section>
+      <section className="contact-details page-width" id="blog"><div><p className="section-kicker">Get in touch</p><a href="mailto:johnry.atienza@gmail.com">✉ <span>johnry.atienza@gmail.com</span></a><a href="tel:+639171405646">⌕ <span>+63 917 140 5646</span></a><a href="https://johnryatienza.com">↗ <span>johnryatienza.com</span></a><a href="#contact">◷ <span>Available for new projects</span></a></div><div className="details-note"><p className="section-kicker">A few words</p><h3>Good work starts<br />with a good conversation.</h3><p>Have an idea, a challenge, or a blank canvas? I&apos;d love to hear what you&apos;re working on.</p></div></section>
 
-      <footer className="site-footer page-width"><a className="brand" href="#home">JA<span>.</span></a><p>© {new Date().getFullYear()} Johnry Atienza. All rights reserved.</p><div className="social-links"><a href="https://github.com" aria-label="GitHub"><SocialIcon kind="github" /></a><a href="https://linkedin.com" aria-label="LinkedIn"><SocialIcon kind="linkedin" /></a><a href="mailto:hello@johnryatienza.dev" aria-label="Email"><SocialIcon kind="email" /></a></div></footer>
+      <footer className="site-footer page-width"><a className="brand" href="#home">JA<span>.</span></a><p>© {new Date().getFullYear()} Johnry Atienza. All rights reserved.</p><div className="social-links"><a href="https://johnryatienza.com" aria-label="Personal website"><SocialIcon kind="website" /></a><a href="mailto:johnry.atienza@gmail.com" aria-label="Email"><SocialIcon kind="email" /></a></div></footer>
     </main>
   );
 }
