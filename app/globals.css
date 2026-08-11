@@ -207,3 +207,17 @@ main.motion-ready .timeline-item { border-left-color: var(--line); }
   .experience-slide-next,
   .experience-slide-previous { animation: none; }
 }
+
+/* Desktop shows four experience containers in one horizontal slide. */
+.experience-slide-group[data-experience-page] { display: none; }
+.experience-slide-group.experience-page-active { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.experience-slide-group .timeline-item { width: auto; max-width: none; margin: 0; padding: 0 20px 0 24px; }
+.experience-slide-group .experience-copy { max-width: none; margin: 22px 0 0; font-size: 12px; line-height: 1.55; }
+
+@media (max-width: 900px) {
+  .experience-controls { display: none; }
+  .experience-slide-group[data-experience-page] { display: block; }
+  .experience-slide-group .timeline-item { width: 100%; max-width: none; margin: 0; padding: 0 0 34px 28px; }
+  .experience-slide-group .timeline-item:last-child { padding-bottom: 0; }
+  .experience-slide-group .experience-copy { max-width: none; margin: 22px 0 0; font-size: 12px; line-height: 1.65; }
+}
