@@ -284,8 +284,6 @@ export default function Home() {
           <div className="hero-actions"><a className="button button-dark" href="#projects">View my work <Arrow /></a><a className="button button-light" href="/Johnry-Atienza-CV-2026.pdf" download>Download CV <span className="download-icon" aria-hidden="true">⇩</span></a></div>
           <div className="social-links" aria-label="Social links"><a href="https://johnryatienza.com" aria-label="Personal website"><SocialIcon kind="website" /></a><a href="mailto:johnry.atienza@gmail.com" aria-label="Email"><SocialIcon kind="email" /></a></div>
         </div>
-        <div className="hero-scroll"><span>Scroll</span><b>＋</b></div>
-        <div className="hero-dots" aria-hidden="true"><i className="active" /><i /><i /><i /></div>
       </section>
 
       <section className="intro-section page-width" id="about">

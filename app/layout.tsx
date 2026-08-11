@@ -10,7 +10,7 @@ const googleSansFlex = Google_Sans_Flex({
 });
 
 export const metadata = {
-  title: "Johnry Atienza — Senior Frontend Developer",
+  title: "Johnry Atienza - Senior Frontend Developer",
   description: "The portfolio of Johnry Atienza, a senior frontend developer building efficient, scalable, and maintainable web applications.",
   icons: { icon: "/favicon.svg" },
 };
