@@ -145,9 +145,6 @@ function useMotionEffects() {
     root.classList.add("motion-ready");
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const mobileViewport = window.matchMedia("(max-width: 900px)");
-    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
-    const lowPowerDevice = (navigator.hardwareConcurrency > 0 && navigator.hardwareConcurrency <= 4) || connection?.saveData === true;
     const revealElements = Array.from(root.querySelectorAll<HTMLElement>("[data-reveal]"));
     const parallaxElements = Array.from(root.querySelectorAll<HTMLElement>("[data-parallax-speed]"));
     const hero = root.querySelector<HTMLElement>(".hero");
@@ -173,7 +170,7 @@ function useMotionEffects() {
 
     const updateMotion = () => {
       frame = 0;
-      const parallaxDisabled = reducedMotion.matches || mobileViewport.matches || lowPowerDevice;
+      const parallaxDisabled = reducedMotion.matches;
 
       if (parallaxDisabled) {
         parallaxElements.forEach((element) => element.style.setProperty("--parallax-y", "0px"));
@@ -275,7 +272,7 @@ export default function Home() {
       </header>
 
       <section className="hero" id="home" data-parallax-section>
-        <div className="hero-photo" data-parallax-speed="0.12" aria-hidden="true"><div className="hero-ray-layer" data-parallax-speed="0.08" /><div className="hero-fog-layer" data-parallax-speed="0.16" /><div className="hero-mountain-layer" data-parallax-speed="0.28" /><div className="hero-person"><i className="person-head" /><i className="person-body" /><i className="person-arm" /><i className="person-legs" /></div><div className="hero-horizon" /></div>
+        <div className="hero-photo" data-parallax-speed="0.5" aria-hidden="true"><div className="hero-ray-layer" data-parallax-speed="0.08" /><div className="hero-fog-layer" data-parallax-speed="0.16" /><div className="hero-mountain-layer" data-parallax-speed="0.28" /><div className="hero-person"><i className="person-head" /><i className="person-body" /><i className="person-arm" /><i className="person-legs" /></div><div className="hero-horizon" /></div>
         <div className="hero-content page-width" data-hero-content>
           <p className="eyebrow">Hi, I&apos;m</p>
           <h1>Johnry Atienza</h1>
