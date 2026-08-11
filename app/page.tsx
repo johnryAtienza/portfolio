@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const navigation = [
   ["Home", "home"],
@@ -107,13 +107,105 @@ function ObjectiveIcon({ type }: { type: "objective" | "problem" | "detail" | "l
   return <svg {...iconProps}><path d="M8 38V29h7v9M20 38V23h7v15M32 38V17h7v21" /><path d="M8 24 18 18l6 3 12-11" /><path d="M29 10h7v7" /></svg>;
 }
 
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function useMotionEffects() {
+  const mainRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const root = mainRef.current;
+    if (!root) return;
+
+    root.classList.add("motion-ready");
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const mobileViewport = window.matchMedia("(max-width: 900px)");
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    const lowPowerDevice = (navigator.hardwareConcurrency > 0 && navigator.hardwareConcurrency <= 4) || connection?.saveData === true;
+    const revealElements = Array.from(root.querySelectorAll<HTMLElement>("[data-reveal]"));
+    const parallaxElements = Array.from(root.querySelectorAll<HTMLElement>("[data-parallax-speed]"));
+    const hero = root.querySelector<HTMLElement>(".hero");
+    const heroContent = root.querySelector<HTMLElement>("[data-hero-content]");
+    let frame = 0;
+
+    const revealObserver = reducedMotion.matches
+      ? undefined
+      : new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            revealObserver?.unobserve(entry.target);
+          }
+        });
+      }, { rootMargin: "0px 0px -12% 0px", threshold: 0.12 });
+
+    if (revealObserver) {
+      revealElements.forEach((element) => revealObserver.observe(element));
+    } else {
+      revealElements.forEach((element) => element.classList.add("is-visible"));
+    }
+
+    const updateMotion = () => {
+      frame = 0;
+      const parallaxDisabled = reducedMotion.matches || mobileViewport.matches || lowPowerDevice;
+
+      if (parallaxDisabled) {
+        parallaxElements.forEach((element) => element.style.setProperty("--parallax-y", "0px"));
+        if (heroContent) {
+          heroContent.style.opacity = "";
+          heroContent.style.transform = "";
+        }
+        return;
+      }
+
+      const viewportCenter = window.innerHeight / 2;
+      parallaxElements.forEach((element) => {
+        const section = element.closest<HTMLElement>("[data-parallax-section]");
+        if (!section) return;
+        const bounds = section.getBoundingClientRect();
+        const distanceFromCenter = (bounds.top + bounds.height / 2 - viewportCenter) / window.innerHeight;
+        const speed = Number(element.dataset.parallaxSpeed ?? 0);
+        const offset = clamp(distanceFromCenter * speed * 120, -42, 42);
+        element.style.setProperty("--parallax-y", `${offset.toFixed(2)}px`);
+      });
+
+      if (hero && heroContent) {
+        const bounds = hero.getBoundingClientRect();
+        const progress = clamp(-bounds.top / (bounds.height * 0.72), 0, 1);
+        heroContent.style.opacity = (1 - progress * 0.5).toFixed(3);
+        heroContent.style.transform = `translate3d(0, ${(-progress * 26).toFixed(2)}px, 0)`;
+      }
+    };
+
+    const scheduleMotion = () => {
+      if (!frame) frame = window.requestAnimationFrame(updateMotion);
+    };
+
+    window.addEventListener("scroll", scheduleMotion, { passive: true });
+    window.addEventListener("resize", scheduleMotion);
+    updateMotion();
+
+    return () => {
+      revealObserver?.disconnect();
+      window.removeEventListener("scroll", scheduleMotion);
+      window.removeEventListener("resize", scheduleMotion);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  return mainRef;
+}
+
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const mainRef = useMotionEffects();
 
   const closeMenu = () => setMenuOpen(false);
 
   return (
-    <main>
+    <main ref={mainRef}>
       <header className={`site-header ${menuOpen ? "menu-is-open" : ""}`}>
         <a className="brand" href="#home" onClick={closeMenu}>JA<span>.</span></a>
         <nav className="desktop-nav" aria-label="Primary navigation">
@@ -124,9 +216,9 @@ export default function Home() {
         {menuOpen && <nav className="mobile-nav" aria-label="Mobile navigation">{navigation.map(([label, id]) => <a key={id} href={`#${id}`} onClick={closeMenu}>{label}<Arrow /></a>)}<a className="mobile-contact" href="mailto:hello@johnryatienza.dev" onClick={closeMenu}>Start a conversation <Arrow /></a></nav>}
       </header>
 
-      <section className="hero" id="home">
-        <div className="hero-photo" aria-hidden="true"><div className="hero-person"><i className="person-head" /><i className="person-body" /><i className="person-arm" /><i className="person-legs" /></div><div className="hero-horizon" /></div>
-        <div className="hero-content page-width">
+      <section className="hero" id="home" data-parallax-section>
+        <div className="hero-photo" aria-hidden="true"><div className="hero-ray-layer" data-parallax-speed="0.08" /><div className="hero-fog-layer" data-parallax-speed="0.16" /><div className="hero-mountain-layer" data-parallax-speed="0.28" /><div className="hero-person"><i className="person-head" /><i className="person-body" /><i className="person-arm" /><i className="person-legs" /></div><div className="hero-horizon" /></div>
+        <div className="hero-content page-width" data-hero-content>
           <p className="eyebrow">Hi, I&apos;m</p>
           <h1>Johnry Atienza</h1>
           <p className="hero-role">Frontend Developer</p>
@@ -139,21 +231,21 @@ export default function Home() {
       </section>
 
       <section className="intro-section page-width" id="about">
-        <div className="intro-lead"><p className="section-kicker">About me</p><h2>Crafting digital<br />experiences that<br />make an <em>impact.</em></h2><p>I&apos;m a passionate developer who loves turning ideas into interactive solutions. I focus on performance, accessibility and clean code.</p><a className="text-button" href="#contact">More about me <Arrow /></a></div>
-        <div className="objective-grid"><div className="objective-main"><ObjectiveIcon type="objective" /><div><p className="section-kicker">Objective</p><p>To leverage my skills in building scalable and efficient web applications while continuously learning and contributing to innovative projects that create real value for users and businesses.</p></div></div><div className="trait"><ObjectiveIcon type="problem" /><div><strong>Problem Solver</strong><p>I enjoy solving complex problems with simple, elegant solutions.</p></div></div><div className="trait"><ObjectiveIcon type="detail" /><div><strong>Detail Oriented</strong><p>I pay attention to details that create intuitive and seamless experiences.</p></div></div><div className="trait"><ObjectiveIcon type="learning" /><div><strong>Continuous Learner</strong><p>I stay up-to-date with modern technologies and best practices.</p></div></div></div>
+        <div className="intro-lead" data-reveal><p className="section-kicker">About me</p><h2>Crafting digital<br />experiences that<br />make an <em>impact.</em></h2><p>I&apos;m a passionate developer who loves turning ideas into interactive solutions. I focus on performance, accessibility and clean code.</p><a className="text-button" href="#contact">More about me <Arrow /></a></div>
+        <div className="objective-grid"><div className="objective-main" data-reveal><ObjectiveIcon type="objective" /><div><p className="section-kicker">Objective</p><p>To leverage my skills in building scalable and efficient web applications while continuously learning and contributing to innovative projects that create real value for users and businesses.</p></div></div><div className="trait" data-reveal data-reveal-delay="1"><ObjectiveIcon type="problem" /><div><strong>Problem Solver</strong><p>I enjoy solving complex problems with simple, elegant solutions.</p></div></div><div className="trait" data-reveal data-reveal-delay="2"><ObjectiveIcon type="detail" /><div><strong>Detail Oriented</strong><p>I pay attention to details that create intuitive and seamless experiences.</p></div></div><div className="trait" data-reveal data-reveal-delay="3"><ObjectiveIcon type="learning" /><div><strong>Continuous Learner</strong><p>I stay up-to-date with modern technologies and best practices.</p></div></div></div>
       </section>
 
-      <section className="projects-section" id="projects"><div className="page-width"><div className="section-heading"><div><p className="section-kicker">Featured projects</p><h2>Things I&apos;ve Built</h2></div><a className="button button-dark project-cta" href="#contact">View all projects <Arrow /></a></div><div className="project-grid">{projects.map((project) => <article className="project-card" key={project.title}><ProjectVisual type={project.type} /><div className="project-card-body"><div className="project-title-row"><h3>{project.title}</h3><Arrow diagonal /></div><p>{project.description}</p><div className="tags">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></div></article>)}</div><div className="carousel-dots" aria-label="Project carousel"><i className="active" /><i /><i /></div></div></section>
+      <section className="projects-section" id="projects"><div className="page-width"><div className="section-heading"><div><p className="section-kicker">Featured projects</p><h2>Things I&apos;ve Built</h2></div><a className="button button-dark project-cta" href="#contact">View all projects <Arrow /></a></div><div className="project-grid">{projects.map((project, index) => <article className="project-card" data-reveal data-reveal-delay={index} key={project.title}><ProjectVisual type={project.type} /><div className="project-card-body"><div className="project-title-row"><h3>{project.title}</h3><Arrow diagonal /></div><p>{project.description}</p><div className="tags">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></div></article>)}</div><div className="carousel-dots" aria-label="Project carousel"><i className="active" /><i /><i /></div></div></section>
 
-      <section className="career-section page-width" id="experience"><div className="section-heading"><div><p className="section-kicker">Experience</p><h2>Where I&apos;ve Worked</h2></div><a className="view-all-mobile" href="#contact">View full experience <Arrow /></a></div><div className="timeline">{[["S", "Solute Digital", "Senior Frontend Developer", "2023 — Present", "Lead frontend development for multiple projects using React, Next.js and TypeScript. Mentored junior developers and improved performance."], ["W", "WebCraft Studio", "Frontend Developer", "2021 — 2023", "Built responsive websites and web applications for clients across different industries. Focused on performance and SEO."], ["D", "Dev Solutions", "Junior Web Developer", "2019 — 2021", "Developed and maintained websites using HTML, CSS, JavaScript and PHP. Collaborated with designers and backend developers."], ["F", "Freelance", "Web Developer", "2016 — 2019", "Worked on various freelance projects ranging from landing pages to full website implementations."]].map(([initial, company, role, years, copy]) => <article className="timeline-item" key={company}><div className="timeline-marker">{initial}</div><div><h3>{company}</h3><p className="role">{role}</p><p className="years">{years}</p><p>{copy}</p></div></article>)}</div></section>
+      <section className="career-section page-width" id="experience"><div className="section-heading"><div><p className="section-kicker">Experience</p><h2>Where I&apos;ve Worked</h2></div><a className="view-all-mobile" href="#contact">View full experience <Arrow /></a></div><div className="timeline"><div className="timeline-line" data-reveal aria-hidden="true" />{[["S", "Solute Digital", "Senior Frontend Developer", "2023 — Present", "Lead frontend development for multiple projects using React, Next.js and TypeScript. Mentored junior developers and improved performance."], ["W", "WebCraft Studio", "Frontend Developer", "2021 — 2023", "Built responsive websites and web applications for clients across different industries. Focused on performance and SEO."], ["D", "Dev Solutions", "Junior Web Developer", "2019 — 2021", "Developed and maintained websites using HTML, CSS, JavaScript and PHP. Collaborated with designers and backend developers."], ["F", "Freelance", "Web Developer", "2016 — 2019", "Worked on various freelance projects ranging from landing pages to full website implementations."]].map(([initial, company, role, years, copy], index) => <article className="timeline-item" data-reveal data-reveal-delay={index} key={company}><div className="timeline-marker">{initial}</div><div><h3>{company}</h3><p className="role">{role}</p><p className="years">{years}</p><p>{copy}</p></div></article>)}</div></section>
 
       <section className="skills-section page-width" id="skills"><div className="section-heading"><div><p className="section-kicker">My skills</p><h2>Technologies I Use</h2></div></div><div className="skills-grid">{skills.map(([label, kind, color]) => <div className={`skill-card ${kind === "postgres" ? "wide-skill" : ""}`} key={label}><SkillIcon kind={kind} color={color} /><span>{label}</span></div>)}</div></section>
 
-      <section className="contact-section" id="contact"><div className="contact-backdrop" aria-hidden="true" /><div className="contact-content"><p className="section-kicker">Let&apos;s work together</p><h2>Have a project in mind?</h2><p>I&apos;m currently open for new opportunities and exciting projects.<br />Let&apos;s build something great together.</p><a className="button button-dark" href="mailto:hello@johnryatienza.dev">Get in touch <Arrow /></a></div></section>
+      <section className="contact-section" id="contact" data-parallax-section><div className="contact-backdrop" data-parallax-speed="0.12" aria-hidden="true" /><div className="contact-fog-layer" data-parallax-speed="0.2" aria-hidden="true" /><div className="contact-content"><p className="section-kicker">Let&apos;s work together</p><h2>Have a project in mind?</h2><p>I&apos;m currently open for new opportunities and exciting projects.<br />Let&apos;s build something great together.</p><a className="button button-dark" href="mailto:hello@johnryatienza.dev">Get in touch <Arrow /></a></div></section>
 
       <section className="contact-details page-width" id="blog"><div><p className="section-kicker">Get in touch</p><a href="mailto:hello@johnryatienza.dev">✉ <span>hello@johnryatienza.dev</span></a><a href="tel:+639123456789">⌕ <span>+63 912 345 6789</span></a><a href="#contact">⌖ <span>Philippines</span></a><a href="#contact">◷ <span>Available for new projects</span></a></div><div className="details-note"><p className="section-kicker">A few words</p><h3>Good work starts<br />with a good conversation.</h3><p>Have an idea, a challenge, or a blank canvas? I&apos;d love to hear what you&apos;re working on.</p></div></section>
 
-      <footer className="site-footer page-width"><a className="brand" href="#home">JA<span>.</span></a><p>© 2025 Johnry Atienza. All rights reserved.</p><div className="social-links"><a href="https://github.com" aria-label="GitHub"><SocialIcon kind="github" /></a><a href="https://linkedin.com" aria-label="LinkedIn"><SocialIcon kind="linkedin" /></a><a href="mailto:hello@johnryatienza.dev" aria-label="Email"><SocialIcon kind="email" /></a></div></footer>
+      <footer className="site-footer page-width"><a className="brand" href="#home">JA<span>.</span></a><p>© {new Date().getFullYear()} Johnry Atienza. All rights reserved.</p><div className="social-links"><a href="https://github.com" aria-label="GitHub"><SocialIcon kind="github" /></a><a href="https://linkedin.com" aria-label="LinkedIn"><SocialIcon kind="linkedin" /></a><a href="mailto:hello@johnryatienza.dev" aria-label="Email"><SocialIcon kind="email" /></a></div></footer>
     </main>
   );
 }
