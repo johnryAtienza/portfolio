@@ -275,7 +275,7 @@ export default function Home() {
       </header>
 
       <section className="hero" id="home" data-parallax-section>
-        <div className="hero-photo" aria-hidden="true"><div className="hero-ray-layer" data-parallax-speed="0.08" /><div className="hero-fog-layer" data-parallax-speed="0.16" /><div className="hero-mountain-layer" data-parallax-speed="0.28" /><div className="hero-person"><i className="person-head" /><i className="person-body" /><i className="person-arm" /><i className="person-legs" /></div><div className="hero-horizon" /></div>
+        <div className="hero-photo" data-parallax-speed="0.12" aria-hidden="true"><div className="hero-ray-layer" data-parallax-speed="0.08" /><div className="hero-fog-layer" data-parallax-speed="0.16" /><div className="hero-mountain-layer" data-parallax-speed="0.28" /><div className="hero-person"><i className="person-head" /><i className="person-body" /><i className="person-arm" /><i className="person-legs" /></div><div className="hero-horizon" /></div>
         <div className="hero-content page-width" data-hero-content>
           <p className="eyebrow">Hi, I&apos;m</p>
           <h1>Johnry Atienza</h1>

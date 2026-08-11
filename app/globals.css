@@ -108,6 +108,7 @@ body { font-family: var(--font-google-sans-flex), Arial, Helvetica, sans-serif; 
 /* Subtle, dependency-free motion layer. JavaScript only updates transform and opacity. */
 .hero-photo,
 .contact-section { isolation: isolate; }
+.hero-photo { transform: translate3d(0, var(--parallax-y, 0px), 0) scale(1.06); will-change: transform; }
 .hero-ray-layer,
 .hero-fog-layer,
 .hero-mountain-layer,
