@@ -225,18 +225,41 @@ function useMotionEffects() {
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [experiencePage, setExperiencePage] = useState(0);
-  const [experienceDirection, setExperienceDirection] = useState<"next" | "previous">("next");
+  const [visibleExperienceCount, setVisibleExperienceCount] = useState(4);
+  const [experienceStep, setExperienceStep] = useState(0);
   const mainRef = useMotionEffects();
-  const experiencePageSize = 4;
-  const experiencePageCount = Math.ceil(experience.length / experiencePageSize);
+  const experienceViewportRef = useRef<HTMLDivElement>(null);
+  const experienceMaxIndex = Math.max(0, experience.length - visibleExperienceCount);
+  const activeExperienceIndex = Math.min(experiencePage, experienceMaxIndex);
+  const experienceEnd = Math.min(activeExperienceIndex + visibleExperienceCount, experience.length);
 
   const closeMenu = () => setMenuOpen(false);
   const moveExperience = (direction: "next" | "previous") => {
-    const nextPage = direction === "next" ? Math.min(experiencePageCount - 1, experiencePage + 1) : Math.max(0, experiencePage - 1);
-    if (nextPage === experiencePage) return;
-    setExperienceDirection(direction);
-    setExperiencePage(nextPage);
+    const nextIndex = direction === "next" ? Math.min(experienceMaxIndex, activeExperienceIndex + 1) : Math.max(0, activeExperienceIndex - 1);
+    if (nextIndex === activeExperienceIndex) return;
+    setExperiencePage(nextIndex);
   };
+
+  useEffect(() => {
+    const viewport = experienceViewportRef.current;
+    if (!viewport) return;
+
+    const updateExperienceLayout = () => {
+      const viewportWidth = viewport.clientWidth;
+      const nextVisibleCount = window.innerWidth > 1100 ? 4 : window.innerWidth > 900 ? 3 : window.innerWidth >= 640 ? 2 : 1;
+      setVisibleExperienceCount(nextVisibleCount);
+      setExperienceStep(viewportWidth / nextVisibleCount);
+    };
+
+    updateExperienceLayout();
+    const resizeObserver = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(updateExperienceLayout);
+    resizeObserver?.observe(viewport);
+    window.addEventListener("resize", updateExperienceLayout);
+    return () => {
+      resizeObserver?.disconnect();
+      window.removeEventListener("resize", updateExperienceLayout);
+    };
+  }, []);
 
   return (
     <main ref={mainRef}>
@@ -271,7 +294,7 @@ export default function Home() {
 
       <section className="projects-section" id="projects"><div className="page-width"><div className="section-heading"><div><p className="section-kicker">Featured projects</p><h2>Things I&apos;ve Built</h2></div><a className="button button-dark project-cta" href="#contact">View all projects <Arrow /></a></div><div className="project-grid">{projects.map((project, index) => <article className="project-card" data-reveal data-reveal-delay={index} key={project.title}><ProjectVisual type={project.type} /><div className="project-card-body"><div className="project-title-row"><h3>{project.title}</h3><Arrow diagonal /></div><p>{project.description}</p><div className="tags">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></div></article>)}</div><div className="carousel-dots" aria-label="Project carousel"><i className="active" /><i /><i /></div></div></section>
 
-      <section className="career-section page-width" id="experience"><div className="section-heading experience-heading"><div><p className="section-kicker">Experience</p><h2>Where I&apos;ve Worked</h2></div><div className="experience-controls" aria-label="Experience navigation"><button type="button" aria-label="Previous experience page" disabled={experiencePage === 0} onClick={() => moveExperience("previous")}>← <span>Previous</span></button><span aria-live="polite">{experiencePage + 1} / {experiencePageCount}</span><button type="button" aria-label="Next experience page" disabled={experiencePage === experiencePageCount - 1} onClick={() => moveExperience("next")}><span>Next</span> →</button></div></div><div className="timeline experience-timeline"><div className="timeline-line" data-reveal aria-hidden="true" />{Array.from({ length: experiencePageCount }, (_, page) => <div className={`experience-slide-group ${page === experiencePage ? "experience-page-active" : ""} ${page === experiencePage ? `experience-slide-${experienceDirection}` : ""}`} data-experience-page={page} key={`${page}-${page === experiencePage ? experienceDirection : "idle"}`}>{experience.slice(page * experiencePageSize, (page + 1) * experiencePageSize).map(([initial, company, role, years, copy]) => <article className="timeline-item" key={company}><div className="experience-header"><div className="timeline-marker">{initial}</div><div className="experience-heading-copy"><div className="experience-title-row"><h3>{company}</h3><p className="role">{role}</p></div><p className="years">{years}</p></div></div><p className="experience-copy">{copy}</p></article>)}</div>)}</div></section>
+      <section className="career-section page-width" id="experience"><div className="section-heading experience-heading"><div><p className="section-kicker">Experience</p><h2>Where I&apos;ve Worked</h2></div><div className="experience-controls" aria-label="Experience navigation"><button type="button" aria-label="Previous experience" disabled={activeExperienceIndex === 0} onClick={() => moveExperience("previous")}>← <span>Previous</span></button><span aria-live="polite">{activeExperienceIndex + 1}–{experienceEnd} / {experience.length}</span><button type="button" aria-label="Next experience" disabled={activeExperienceIndex === experienceMaxIndex} onClick={() => moveExperience("next")}><span>Next</span> →</button></div></div><div className="timeline experience-timeline"><div className="timeline-line" data-reveal aria-hidden="true" /><div className="experience-carousel-viewport" ref={experienceViewportRef}><div className="experience-carousel-track" style={{ transform: experienceStep ? `translate3d(-${activeExperienceIndex * experienceStep}px, 0, 0)` : undefined }}>{experience.map(([initial, company, role, years, copy]) => <article className="timeline-item" key={company} style={{ flex: `0 0 ${100 / visibleExperienceCount}%` }}><div className="experience-header"><div className="timeline-marker">{initial}</div><div className="experience-heading-copy"><div className="experience-title-row"><h3>{company}</h3><p className="role">{role}</p></div><p className="years">{years}</p></div></div><p className="experience-copy">{copy}</p></article>)}</div></div></div></section>
 
       <section className="skills-section page-width" id="skills"><div className="section-heading"><div><p className="section-kicker">My skills</p><h2>Technologies I Use</h2></div></div><div className="skills-grid">{skills.map(([label, kind, color]) => <div className={`skill-card ${kind === "maps" ? "wide-skill" : ""}`} key={label}><SkillIcon kind={kind} color={color} /><span>{label}</span></div>)}</div></section>
 
