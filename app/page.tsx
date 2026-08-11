@@ -148,7 +148,9 @@ function useMotionEffects() {
     const revealElements = Array.from(root.querySelectorAll<HTMLElement>("[data-reveal]"));
     const parallaxElements = Array.from(root.querySelectorAll<HTMLElement>("[data-parallax-speed]"));
     const hero = root.querySelector<HTMLElement>(".hero");
+    const heroPhoto = root.querySelector<HTMLElement>("[data-hero-background]");
     const heroContent = root.querySelector<HTMLElement>("[data-hero-content]");
+    const mobileHeroFallback = window.matchMedia("(max-width: 900px)");
     let frame = 0;
 
     const revealObserver = reducedMotion.matches
@@ -174,11 +176,22 @@ function useMotionEffects() {
 
       if (parallaxDisabled) {
         parallaxElements.forEach((element) => element.style.setProperty("--parallax-y", "0px"));
+        heroPhoto?.style.removeProperty("--hero-bg-y");
         if (heroContent) {
           heroContent.style.opacity = "";
           heroContent.style.transform = "";
         }
         return;
+      }
+
+      if (hero && heroPhoto) {
+        if (mobileHeroFallback.matches) {
+          const bounds = hero.getBoundingClientRect();
+          const offset = clamp(-bounds.top, 0, bounds.height);
+          heroPhoto.style.setProperty("--hero-bg-y", `${offset.toFixed(2)}px`);
+        } else {
+          heroPhoto.style.removeProperty("--hero-bg-y");
+        }
       }
 
       const viewportCenter = window.innerHeight / 2;
@@ -272,7 +285,7 @@ export default function Home() {
       </header>
 
       <section className="hero" id="home" data-parallax-section>
-        <div className="hero-photo" data-parallax-speed="0.5" aria-hidden="true"><div className="hero-ray-layer" data-parallax-speed="0.08" /><div className="hero-fog-layer" data-parallax-speed="0.16" /><div className="hero-mountain-layer" data-parallax-speed="0.28" /><div className="hero-person"><i className="person-head" /><i className="person-body" /><i className="person-arm" /><i className="person-legs" /></div><div className="hero-horizon" /></div>
+        <div className="hero-photo" data-hero-background aria-hidden="true"><div className="hero-ray-layer" data-parallax-speed="0.08" /><div className="hero-fog-layer" data-parallax-speed="0.16" /><div className="hero-mountain-layer" data-parallax-speed="0.28" /><div className="hero-person"><i className="person-head" /><i className="person-body" /><i className="person-arm" /><i className="person-legs" /></div><div className="hero-horizon" /></div>
         <div className="hero-content page-width" data-hero-content>
           <p className="eyebrow">Hi, I&apos;m</p>
           <h1>Johnry Atienza</h1>
@@ -290,7 +303,7 @@ export default function Home() {
 
       <section className="projects-section" id="projects"><div className="page-width"><div className="section-heading"><div><p className="section-kicker">Featured projects</p><h2>Things I&apos;ve Built</h2></div><a className="button button-dark project-cta" href="#contact">View all projects <Arrow /></a></div><div className="project-grid">{projects.map((project, index) => <article className="project-card" data-reveal data-reveal-delay={index} key={project.title}><ProjectVisual type={project.type} /><div className="project-card-body"><div className="project-title-row"><h3>{project.title}</h3><Arrow diagonal /></div><p>{project.description}</p><div className="tags">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></div></article>)}</div><div className="carousel-dots" aria-label="Project carousel"><i className="active" /><i /><i /></div></div></section>
 
-      <section className="career-section page-width" id="experience"><div className="section-heading experience-heading"><div><p className="section-kicker">Experience</p><h2>Where I&apos;ve Worked</h2></div><div className="experience-controls" aria-label="Experience navigation"><button type="button" aria-label="Previous experience" disabled={activeExperienceIndex === 0} onClick={() => moveExperience("previous")}>← <span>Previous</span></button><span aria-live="polite">{activeExperienceIndex + 1}–{experienceEnd} / {experience.length}</span><button type="button" aria-label="Next experience" disabled={activeExperienceIndex === experienceMaxIndex} onClick={() => moveExperience("next")}><span>Next</span> →</button></div></div><div className="timeline experience-timeline"><div className="timeline-line" data-reveal aria-hidden="true" /><div className="experience-carousel-viewport" ref={experienceViewportRef}><div className="experience-carousel-track" style={{ transform: `translate3d(${experienceCarouselInset - activeExperienceIndex * experienceStep}px, 0, 0)` }}>{experience.map(([initial, company, role, years, copy]) => <article className="timeline-item" key={company} style={{ flex: `0 0 ${100 / visibleExperienceCount}%` }}><div className="experience-header"><div className="timeline-marker">{initial}</div><div className="experience-heading-copy"><div className="experience-title-row"><h3>{company}</h3><p className="role">{role}</p></div><p className="years">{years}</p></div></div><p className="experience-copy">{copy}</p></article>)}</div></div></div></section>
+      <section className="career-section page-width" id="experience"><div className="section-heading experience-heading"><div><p className="section-kicker">Experience</p><h2>Where I&apos;ve Worked</h2></div><div className="experience-controls" aria-label="Experience navigation"><button type="button" aria-label="Previous experience" disabled={activeExperienceIndex === 0} onClick={() => moveExperience("previous")}>← <span>Previous</span></button><span aria-live="polite">{activeExperienceIndex + 1}–{experienceEnd} / {experience.length}</span><button type="button" aria-label="Next experience" disabled={activeExperienceIndex === experienceMaxIndex} onClick={() => moveExperience("next")}><span>Next</span> →</button></div></div><div className="timeline experience-timeline"><div className="experience-carousel-viewport" ref={experienceViewportRef}><div className="experience-carousel-track" style={{ transform: `translate3d(${experienceCarouselInset - activeExperienceIndex * experienceStep}px, 0, 0)` }}>{experience.map(([initial, company, role, years, copy]) => <article className="timeline-item" key={company} style={{ flex: `0 0 ${100 / visibleExperienceCount}%` }}><div className="experience-header"><div className="timeline-marker">{initial}</div><div className="experience-heading-copy"><div className="experience-title-row"><h3>{company}</h3><p className="role">{role}</p></div><p className="years">{years}</p></div></div><p className="experience-copy">{copy}</p></article>)}</div></div></div></section>
 
       <section className="skills-section page-width" id="skills"><div className="section-heading"><div><p className="section-kicker">My skills</p><h2>Technologies I Use</h2></div></div><div className="skills-grid">{skills.map(([label, kind, color]) => <div className="skill-card" key={label}><SkillIcon kind={kind} color={color} /><span>{label}</span></div>)}</div></section>
 
